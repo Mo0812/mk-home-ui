@@ -4,13 +4,16 @@
             rel="stylesheet"
             href="https://cdn.materialdesignicons.com/5.3.45/css/materialdesignicons.min.css"
         />
-        <b-table :data="lightbulbs">
+        <b-table :data="lightbulbs" :striped="true">
             <template slot-scope="props">
-                <b-table-column field="id" label="ID">
+                <b-table-column field="id" label="ID" sortable>
                     {{ props.row.id }}
                 </b-table-column>
-                <b-table-column field="name" label="Name">
+                <b-table-column field="name" label="Name" sortable>
                     {{ props.row.name }}
+                </b-table-column>
+                <b-table-column field="group" label="Gruppe" sortable>
+                    {{ props.row.group.name }}
                 </b-table-column>
                 <b-table-column field="isAlive" label="verbunden" centered>
                     <template v-if="props.row.isAlive">
@@ -20,7 +23,12 @@
                         <b-icon icon="lan-disconnect" type="is-danger" />
                     </template>
                 </b-table-column>
-                <b-table-column field="isOn" label="eingeschaltet" centered>
+                <b-table-column
+                    field="isOn"
+                    label="eingeschaltet"
+                    centered
+                    sortable
+                >
                     <b-button
                         :disabled="props.row.busy"
                         @click="toggleLightbulb(props.row.id)"
@@ -50,7 +58,12 @@
                         <span class="tag">Gerät nicht dimmbar</span>
                     </template>
                 </b-table-column>
-                <b-table-column field="color" label="Lichtfarbe" centered>
+                <b-table-column
+                    field="color"
+                    label="Lichtfarbe"
+                    centered
+                    sortable
+                >
                     <ColorMeter :color="props.row.color" />
                 </b-table-column>
                 <b-table-column field="spectrum" label="Farbspektrum" centered>
@@ -72,22 +85,39 @@ export default {
     },
     data() {
         return {
-            lightbulbs: []
+            lightbulbs: [],
+            groups: [],
+            busy: false
         };
     },
     created() {
-        this.fetchLightbulbs();
+        this.fetchData();
     },
     methods: {
-        async fetchLightbulbs() {
+        async fetchData() {
+            this.busy = true;
             let response = await axios({
                 method: "GET",
                 url: "http://192.168.178.49:8000/list"
             });
             if (response.status == 200) {
+                this.groups = Object.entries(response.data.groups).map(
+                    ([key, item]) => {
+                        return {
+                            id: item.instanceId,
+                            name: item.name,
+                            isOn: item.onOff,
+                            groupMember: item.deviceIDs
+                        };
+                    }
+                );
                 this.lightbulbs = Object.entries(response.data.lightbulbs)
                     .filter(([key, item]) => key != 65551)
                     .map(([key, item]) => {
+                        let groupInfo = this.groups.filter(group =>
+                            group.groupMember.includes(item.instanceId)
+                        );
+                        let group = groupInfo.length > 0 ? groupInfo[0] : null;
                         let lightInfo = item.lightList[0];
                         return {
                             id: item.instanceId,
@@ -101,10 +131,12 @@ export default {
                             },
                             color: lightInfo.color,
                             spectrum: lightInfo.spectrum,
+                            group: group,
                             busy: false
                         };
                     });
             }
+            this.busy = false;
         },
         async toggleLightbulb(id) {
             let device = this.lightbulbs.filter(item => item.id == id);
