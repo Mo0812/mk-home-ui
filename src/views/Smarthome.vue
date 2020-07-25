@@ -111,6 +111,7 @@ export default {
                         };
                     }
                 );
+
                 this.lightbulbs = Object.entries(response.data.lightbulbs)
                     .filter(([key, item]) => key != 65551)
                     .map(([key, item]) => {
