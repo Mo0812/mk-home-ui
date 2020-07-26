@@ -1,5 +1,8 @@
 <template>
-    <ViewContainer :hasSidebar="false">
+    <ViewContainer>
+        <template v-slot:sidebar>
+            <SmarthomeMenu />
+        </template>
         <section class="smarthome">
             <link
                 rel="stylesheet"
@@ -89,12 +92,14 @@
 <script>
 import axios from "axios";
 import View from "@/mixins/View";
+import SmarthomeMenu from "@/components/SmarthomeMenu/SmarthomeMenu";
 import ColorMeter from "@/components/ColorMeter/ColorMeter";
 
 export default {
     name: "smarthome",
     mixins: [View],
     components: {
+        SmarthomeMenu,
         ColorMeter
     },
     data() {
