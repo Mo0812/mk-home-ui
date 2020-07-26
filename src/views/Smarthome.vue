@@ -107,7 +107,16 @@ export default {
     created() {
         this.fetchData();
     },
+    mounted() {
+        this.eventBus.$on("refresh", this.fetchData);
+    },
+    beforeDestroy() {
+        this.eventBus.$off("refresh", this.fetchData);
+    },
     methods: {
+        test() {
+            console.log("REFRESH");
+        },
         async fetchData() {
             this.busy = true;
             let response = await axios({

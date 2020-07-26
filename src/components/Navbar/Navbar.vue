@@ -23,8 +23,8 @@
         <template slot="end">
             <b-navbar-item tag="div">
                 <div class="buttons">
-                    <a class="button is-primary">
-                        <strong>Settings</strong>
+                    <a class="button is-primary" @click="toggleRefreshEvent">
+                        <b-icon icon="sync" />
                     </a>
                 </div>
             </b-navbar-item>
@@ -33,7 +33,14 @@
 </template>
 
 <script>
+import View from "@/mixins/View";
 export default {
-    name: "Navbar"
+    name: "Navbar",
+    mixins: [View],
+    methods: {
+        toggleRefreshEvent() {
+            this.eventBus.$emit("refresh");
+        }
+    }
 };
 </script>
