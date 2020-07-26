@@ -10,14 +10,19 @@ export default new Router({
             path: "/",
             name: "smarthome",
             component: Smarthome
-        }
-        /*         {
-            path: "/about",
-            name: "about",
+        },
+        {
+            path: "/smarthome",
+            name: "smarthome",
+            component: Smarthome
+        },
+        {
+            path: "/monitoring",
+            name: "monitoring",
             // route level code-splitting
             // this generates a separate chunk (about.[hash].js) for this route
             // which is lazy-loaded when the route is visited.
-            component: () => import("./views/About.vue")
-        } */
+            component: () => import("./views/Monitoring.vue")
+        }
     ]
 });

@@ -12,10 +12,10 @@
             <b-navbar-item href="#">
                 Dashboard
             </b-navbar-item>
-            <b-navbar-item href="#">
+            <b-navbar-item tag="router-link" to="/smarthome">
                 Smarthome
             </b-navbar-item>
-            <b-navbar-item href="#">
+            <b-navbar-item tag="router-link" to="/monitoring">
                 System
             </b-navbar-item>
         </template>
