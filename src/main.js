@@ -10,6 +10,17 @@ Vue.config.productionTip = false;
 
 Vue.use(Buefy);
 
+const socket = new WebSocket("ws://192.168.178.49:4000");
+
+socket.addEventListener("open", () => {
+    socket.send("Requesting connection");
+});
+
+socket.addEventListener("message", event => {
+    console.log(`Message from server: ${event.data}`);
+    store.dispatch("fetchSmarthomeData");
+});
+
 new Vue({
     router,
     store,

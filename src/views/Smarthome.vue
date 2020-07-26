@@ -50,7 +50,7 @@
                         <template v-if="props.row.isDimmable">
                             <b-slider
                                 :style="{ margin: '0.5rem 0' }"
-                                v-model="props.row.brightness.current"
+                                :value="props.row.brightness.current"
                                 :min="0"
                                 :max="100"
                                 :disabled="props.row.busy"
@@ -99,10 +99,16 @@ export default {
     },
     data() {
         return {
-            lightbulbs: [],
-            groups: [],
             busy: false
         };
+    },
+    computed: {
+        lightbulbs() {
+            return this.$store.getters.getLightbulbs;
+        },
+        groups() {
+            return this.$store.getters.getGroups;
+        }
     },
     created() {
         this.fetchData();
@@ -114,94 +120,19 @@ export default {
         this.eventBus.$off("refresh", this.fetchData);
     },
     methods: {
-        test() {
-            console.log("REFRESH");
-        },
         async fetchData() {
             this.busy = true;
-            let response = await axios({
-                method: "GET",
-                url: "http://192.168.178.49:8000/list"
-            });
-            if (response.status == 200) {
-                this.groups = Object.entries(response.data.groups).map(
-                    ([key, item]) => {
-                        return {
-                            id: item.instanceId,
-                            name: item.name,
-                            isOn: item.onOff,
-                            groupMember: item.deviceIDs
-                        };
-                    }
-                );
-
-                this.lightbulbs = Object.entries(response.data.lightbulbs)
-                    .filter(([key, item]) => key != 65551)
-                    .map(([key, item]) => {
-                        let groupInfo = this.groups.filter(group =>
-                            group.groupMember.includes(item.instanceId)
-                        );
-                        let group = groupInfo.length > 0 ? groupInfo[0] : null;
-                        let lightInfo = item.lightList[0];
-                        return {
-                            id: item.instanceId,
-                            name: item.name,
-                            isAlive: item.alive,
-                            isOn: lightInfo.onOff,
-                            isDimmable: lightInfo.isDimmable,
-                            brightness: {
-                                current: lightInfo.dimmer,
-                                initial: lightInfo.dimmer
-                            },
-                            color: lightInfo.color,
-                            spectrum: lightInfo.spectrum,
-                            group: group,
-                            busy: false
-                        };
-                    });
-            }
+            await this.$store.dispatch("fetchSmarthomeData");
             this.busy = false;
         },
-        async toggleLightbulb(id) {
-            let device = this.lightbulbs.filter(item => item.id == id);
-            if (device.length > 0) {
-                let currentLightbulb = device[0];
-                currentLightbulb.busy = true;
-
-                try {
-                    let response = await axios({
-                        method: "PUT",
-                        url: "http://192.168.178.49:8000/toggle",
-                        data: { device: id }
-                    });
-
-                    currentLightbulb.isOn = !currentLightbulb.isOn;
-                } catch (e) {}
-                currentLightbulb.busy = false;
-            }
+        toggleLightbulb(id) {
+            this.$store.dispatch("toggleLightbulb", id);
         },
-        async changeBrightness(brightness, id) {
-            let device = this.lightbulbs.filter(item => item.id == id);
-            if (device.length > 0) {
-                let currentLightbulb = device[0];
-                currentLightbulb.busy = true;
-
-                try {
-                    let response = await axios({
-                        method: "PUT",
-                        url: "http://192.168.178.49:8000/brightness",
-                        data: { device: id, brightness: brightness }
-                    });
-                    currentLightbulb.brightness = {
-                        current: brightness,
-                        initial: brightness
-                    };
-                } catch (e) {
-                    currentLightbulb.brightness.current =
-                        currentLightbulb.brightness.initial;
-                }
-                currentLightbulb.busy = false;
-            }
+        changeBrightness(brightness, id) {
+            this.$store.dispatch("changeBrightness", {
+                id: id,
+                brightness: brightness
+            });
         }
     }
 };
