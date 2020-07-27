@@ -8,8 +8,20 @@
                     label="List view"
                     expanded
                 >
-                    <b-menu-item label="Lightbulbs" active> </b-menu-item>
-                    <b-menu-item label="Groups"> </b-menu-item>
+                    <b-menu-item
+                        label="Lightbulbs"
+                        id="lightbulb-list"
+                        :active="active === 'lightbulb-list'"
+                        @click="setActiveMenuItem('lightbulb-list')"
+                    >
+                    </b-menu-item>
+                    <b-menu-item
+                        label="Groups"
+                        id="group-list"
+                        :active="active === 'group-list'"
+                        @click="setActiveMenuItem('group-list')"
+                    >
+                    </b-menu-item>
                 </b-menu-item>
             </b-menu-list>
         </b-menu>
@@ -18,6 +30,23 @@
 
 <script>
 export default {
-    name: "MonitoringMenu"
+    name: "SmarthomeMenu",
+    data() {
+        return {
+            active: "lightbulb-list"
+        };
+    },
+    watch: {
+        active: {
+            handler(value) {
+                this.$emit("change", value);
+            }
+        }
+    },
+    methods: {
+        setActiveMenuItem(id) {
+            this.active = id;
+        }
+    }
 };
 </script>

@@ -21,7 +21,7 @@ let mutations = {
     GROUPS: (state, payload) => {
         state.smarthome.groups = payload;
     },
-    UPDATE_LIGHTBULB_ONOFF: (state, payload) => {
+    UPDATE_LIGHTBULB_ONOFF_TOGGLE: (state, payload) => {
         let device = state.smarthome.lightbulbs.filter(
             item => item.id == payload
         );
@@ -29,6 +29,17 @@ let mutations = {
             let currentLightbulb = device[0];
             currentLightbulb.busy = true;
             currentLightbulb.isOn = !currentLightbulb.isOn;
+            currentLightbulb.busy = false;
+        }
+    },
+    UPDATE_LIGHTBULB_ONOFF: (state, payload) => {
+        let device = state.smarthome.lightbulbs.filter(
+            item => item.id == payload.id
+        );
+        if (device.length > 0) {
+            let currentLightbulb = device[0];
+            currentLightbulb.busy = true;
+            currentLightbulb.isOn = payload.isOn;
             currentLightbulb.busy = false;
         }
     },
@@ -112,7 +123,35 @@ let actions = {
                 data: { device: payload }
             });
 
-            context.commit("UPDATE_LIGHTBULB_ONOFF", payload);
+            context.commit("UPDATE_LIGHTBULB_ONOFF_TOGGLE", payload);
+        } catch (e) {}
+    },
+    async putLightbulbOn(context, payload) {
+        try {
+            await axios({
+                method: "PUT",
+                url: "http://192.168.178.49:8000/on",
+                data: { device: payload }
+            });
+
+            context.commit("UPDATE_LIGHTBULB_ONOFF", {
+                id: payload,
+                isOn: true
+            });
+        } catch (e) {}
+    },
+    async putLightbulbOff(context, payload) {
+        try {
+            await axios({
+                method: "PUT",
+                url: "http://192.168.178.49:8000/off",
+                data: { device: payload }
+            });
+
+            context.commit("UPDATE_LIGHTBULB_ONOFF", {
+                id: payload,
+                isOn: falase
+            });
         } catch (e) {}
     },
     async changeBrightness(context, payload) {
