@@ -1,0 +1,130 @@
+<template>
+    <div class="smarthome-grid-view">
+        <div class="filter">
+            <b-field grouped group-multiline>
+                <b-field>
+                    <b-select
+                        placeholder="Group"
+                        icon="lightbulb-group"
+                        v-model="filter.group"
+                    >
+                        <option :value="null">All</option>
+                        <option
+                            v-for="group in groups"
+                            :key="group.id"
+                            :value="group.id"
+                            >{{ group.name }}</option
+                        >
+                    </b-select>
+                </b-field>
+                <b-field>
+                    <b-select
+                        placeholder="On/Off"
+                        icon="lightbulb-on-outline"
+                        v-model="filter.onOff"
+                    >
+                        <option :value="null">Both</option>
+                        <option :value="true">On</option>
+                        <option :value="false">Off</option>
+                    </b-select>
+                </b-field>
+                <b-field expanded>
+                    <b-input
+                        placeholder="Search..."
+                        type="search"
+                        icon="magnify"
+                        v-model="filter.term"
+                    ></b-input> </b-field
+            ></b-field>
+        </div>
+        <div class="tile is-ancestor">
+            <div
+                v-for="device in lightbulbs"
+                :key="device.id"
+                class="tile is-1"
+            >
+                {{ device.name }}
+            </div>
+        </div>
+    </div>
+</template>
+
+<script>
+import View from "@/mixins/View";
+import ColorMeter from "@/components/ColorMeter/ColorMeter";
+
+export default {
+    name: "SmarthomeGridView",
+    mixins: [View],
+    components: {
+        ColorMeter
+    },
+    data() {
+        return {
+            busy: false,
+            filter: {
+                group: null,
+                onOff: null,
+                term: null
+            }
+        };
+    },
+    computed: {
+        lightbulbs() {
+            return this.filterData(this.$store.getters.getLightbulbs);
+        },
+        groups() {
+            return this.$store.getters.getGroups;
+        }
+    },
+    created() {
+        this.fetchData();
+    },
+    mounted() {
+        this.eventBus.$on("refresh", this.fetchData);
+    },
+    beforeDestroy() {
+        this.eventBus.$off("refresh", this.fetchData);
+    },
+    methods: {
+        async fetchData() {
+            this.busy = true;
+            await this.$store.dispatch("fetchSmarthomeData");
+            this.busy = false;
+        },
+        toggleLightbulb(id) {
+            this.$store.dispatch("toggleLightbulb", id);
+        },
+        changeBrightness(brightness, id) {
+            this.$store.dispatch("changeBrightness", {
+                id: id,
+                brightness: brightness
+            });
+        },
+        filterData(data) {
+            if (this.filter.group) {
+                data = data.filter(item => item.group.id === this.filter.group);
+            }
+            if (this.filter.onOff !== null) {
+                data = data.filter(item => item.isOn === this.filter.onOff);
+                console.log(data);
+            }
+            if (this.filter.term && this.filter.term !== "") {
+                data = data.filter(
+                    item =>
+                        item.name
+                            .toLowerCase()
+                            .includes(this.filter.term.toLowerCase()) ||
+                        item.group.name
+                            .toLowerCase()
+                            .includes(this.filter.term.toLowerCase())
+                );
+            }
+            return data;
+        },
+        addGroupFilter(groupId) {
+            this.filter.group = groupId;
+        }
+    }
+};
+</script>

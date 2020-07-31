@@ -1,8 +1,8 @@
 <template>
     <div class="smarthome-lightbulb-list">
         <div class="filter">
-            <div class="columns">
-                <div class="column is-three-is-one-fifth">
+            <b-field grouped group-multiline>
+                <b-field>
                     <b-select
                         placeholder="Group"
                         icon="lightbulb-group"
@@ -16,8 +16,8 @@
                             >{{ group.name }}</option
                         >
                     </b-select>
-                </div>
-                <div class="column is-three-is-one-fifth">
+                </b-field>
+                <b-field>
                     <b-select
                         placeholder="On/Off"
                         icon="lightbulb-on-outline"
@@ -27,22 +27,24 @@
                         <option :value="true">On</option>
                         <option :value="false">Off</option>
                     </b-select>
-                </div>
-                <div class="column is-three-fifths">
+                </b-field>
+                <b-field expanded>
                     <b-input
                         placeholder="Search..."
                         type="search"
                         icon="magnify"
                         v-model="filter.term"
-                    ></b-input>
-                </div>
-            </div>
+                    ></b-input> </b-field
+            ></b-field>
         </div>
         <b-table
-            :data="lightbulbs"
-            :striped="true"
-            :hoverable="true"
-            :loading="busy"
+            class="lightbulb-table"
+            :items="lightbulbs"
+            :fields="fields"
+            striped
+            :busy="busy"
+            :small="true"
+            primary-key="id"
         >
             <template v-slot:empty>
                 <section class="section">
@@ -55,72 +57,55 @@
                     </div>
                 </section>
             </template>
-            <template slot-scope="props">
-                <b-table-column field="id" label="ID" sortable>
-                    {{ props.row.id }}
-                </b-table-column>
-                <b-table-column field="name" label="Name" sortable>
-                    {{ props.row.name }}
-                </b-table-column>
-                <b-table-column field="group" label="Gruppe" sortable>
-                    <a href="#" @click="addGroupFilter(props.row.group.id)">{{
-                        props.row.group.name
-                    }}</a>
-                </b-table-column>
-                <b-table-column field="isAlive" label="verbunden" centered>
-                    <template v-if="props.row.isAlive">
-                        <b-icon icon="lan-connect" />
-                    </template>
-                    <template v-else>
-                        <b-icon icon="lan-disconnect" type="is-danger" />
-                    </template>
-                </b-table-column>
-                <b-table-column
-                    field="isOn"
-                    label="eingeschaltet"
-                    centered
-                    sortable
+            <template v-slot:cell(group)="data">
+                <a href="#" @click="addGroupFilter(data.item.group.id)">{{
+                    data.item.group.name
+                }}</a>
+            </template>
+            <template v-slot:cell(isAlive)="data">
+                <template v-if="data.item.isAlive">
+                    <b-icon icon="hdd-network-fill" />
+                </template>
+                <template v-else>
+                    <b-icon icon="exclamation-square" variant="danger" />
+                </template>
+            </template>
+            <template v-slot:cell(isOn)="data">
+                <b-button
+                    :disabled="data.item.busy"
+                    variant="light"
+                    @click="toggleLightbulb(data.item.id)"
                 >
-                    <b-button
-                        :disabled="props.row.busy"
-                        @click="toggleLightbulb(props.row.id)"
-                    >
-                        <b-icon
-                            icon="power"
-                            :type="props.row.isOn ? 'is-success' : 'is-danger'"
-                        />
-                    </b-button>
-                </b-table-column>
-                <b-table-column field="brightness" label="Helligkeit" centered>
-                    <template v-if="props.row.isDimmable">
-                        <b-slider
-                            :style="{ margin: '0.5rem 0' }"
-                            :value="props.row.brightness.current"
-                            :min="0"
-                            :max="100"
-                            :disabled="props.row.busy"
-                            type="is-warning"
-                            @change="changeBrightness($event, props.row.id)"
-                            lazy
-                        /><span class="tag"
-                            >{{ props.row.brightness.current }}%</span
-                        ></template
-                    >
-                    <template v-else>
-                        <span class="tag">Gerät nicht dimmbar</span>
-                    </template>
-                </b-table-column>
-                <b-table-column
-                    field="color"
-                    label="Lichtfarbe"
-                    centered
-                    sortable
+                    <b-icon
+                        icon="power"
+                        :variant="data.item.isOn ? 'success' : 'danger'"
+                    />
+                </b-button>
+            </template>
+            <template v-slot:cell(brightness)="data">
+                <template v-if="data.item.isDimmable">
+                    <b-input
+                        class="brightness-switcher"
+                        type="range"
+                        :value="data.item.brightness.current"
+                        :min="0"
+                        :max="100"
+                        :disabled="data.item.busy"
+                        variant="is-warning"
+                        @change="changeBrightness($event, data.item.id)"
+                    /><span class="tag"
+                        >{{ data.item.brightness.current }}%</span
+                    ></template
                 >
-                    <ColorMeter :color="props.row.color" />
-                </b-table-column>
-                <b-table-column field="spectrum" label="Farbspektrum" centered>
-                    {{ props.row.spectrum }}
-                </b-table-column>
+                <template v-else>
+                    <span class="tag">Gerät nicht dimmbar</span>
+                </template>
+            </template>
+            <template v-slot:cell(color)="data">
+                <ColorMeter :color="data.item.color" />
+            </template>
+            <template v-slot:cell(spectrum)="data">
+                {{ data.item.spectrum }}
             </template>
         </b-table>
     </div>
@@ -130,6 +115,8 @@
 import View from "@/mixins/View";
 import ColorMeter from "@/components/ColorMeter/ColorMeter";
 
+import "./SmarthomeLightbulbList.scss";
+
 export default {
     name: "SmarthomeLightbulbList",
     mixins: [View],
@@ -138,6 +125,53 @@ export default {
     },
     data() {
         return {
+            fields: [
+                {
+                    key: "id",
+                    label: "ID",
+                    sortable: true
+                },
+                {
+                    key: "name",
+                    label: "Name",
+                    sortable: true
+                },
+                {
+                    key: "group",
+                    label: "Group",
+                    sortable: true
+                },
+                {
+                    key: "isAlive",
+                    label: "connected",
+                    sortable: false,
+                    class: "text-center"
+                },
+                {
+                    key: "isOn",
+                    label: "activated",
+                    sortable: true,
+                    class: "text-center"
+                },
+                {
+                    key: "brightness",
+                    label: "Brightness",
+                    sortable: false,
+                    class: "text-center"
+                },
+                {
+                    key: "color",
+                    label: "Color",
+                    sortable: false,
+                    class: "text-center"
+                },
+                {
+                    key: "spectrum",
+                    label: "Spectrum",
+                    sortable: true,
+                    class: "text-center"
+                }
+            ],
             busy: false,
             filter: {
                 group: null,
@@ -172,7 +206,8 @@ export default {
         toggleLightbulb(id) {
             this.$store.dispatch("toggleLightbulb", id);
         },
-        changeBrightness(brightness, id) {
+        changeBrightness(event, id) {
+            let brightness = event;
             this.$store.dispatch("changeBrightness", {
                 id: id,
                 brightness: brightness
@@ -182,7 +217,7 @@ export default {
             if (this.filter.group) {
                 data = data.filter(item => item.group.id === this.filter.group);
             }
-            if (this.filter.onOff) {
+            if (this.filter.onOff !== null) {
                 data = data.filter(item => item.isOn === this.filter.onOff);
             }
             if (this.filter.term && this.filter.term !== "") {

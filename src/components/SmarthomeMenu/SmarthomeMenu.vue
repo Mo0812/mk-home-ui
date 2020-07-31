@@ -1,9 +1,17 @@
 <template>
     <div class="monitoring-menu">
-        <b-menu class="is-custom-mobile">
+        <b-menu class="is-custom-mobile" :accordion="false">
             <b-menu-list label="View mode">
-                <b-menu-item icon="view-grid" label="Grid view"> </b-menu-item>
-                <b-menu-item icon="table-of-contents" :active="true" expanded>
+                <b-menu-item
+                    icon="view-grid"
+                    label="Grid view"
+                    id="grid-view"
+                    :active="currentRoute == '/smarthome/grid'"
+                    tag="router-link"
+                    to="/smarthome/grid"
+                >
+                </b-menu-item>
+                <b-menu-item icon="table-of-contents" expanded>
                     <template v-slot:label="props">
                         List view
                         <b-icon
