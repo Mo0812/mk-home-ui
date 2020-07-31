@@ -6,7 +6,7 @@
                     icon="information-outline"
                     label="Overview"
                 ></b-menu-item>
-                <b-menu-item active icon="settings" label="Metrics">
+                <b-menu-item active icon="speedometer" label="Metrics">
                 </b-menu-item>
             </b-menu-list>
         </b-menu>

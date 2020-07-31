@@ -1,6 +1,6 @@
 <template>
     <div class="smarthome-lightbulb-list">
-        <div class="filter">
+        <!--<div class="filter">
             <div class="columns">
                 <div class="column full">
                     <b-input
@@ -11,9 +11,9 @@
                     ></b-input>
                 </div>
             </div>
-        </div>
+        </div>-->
         <b-table
-            :data="groups"
+            :data="parsedGroups"
             :striped="true"
             :hoverable="true"
             :loading="busy"
@@ -69,7 +69,7 @@
                             @change="changeBrightness($event, props.row.id)"
                             lazy
                         /><span class="tag"
-                            >{{ props.row.brightness.current }}%</span
+                            >{{ props.row.brightness }}%</span
                         ></template
                     >
                     <template v-else>
@@ -95,6 +95,7 @@
 </template>
 
 <script>
+import { mapGetters } from "vuex";
 import View from "@/mixins/View";
 import ColorMeter from "@/components/ColorMeter/ColorMeter";
 
@@ -108,19 +109,33 @@ export default {
         return {
             busy: false,
             filter: {
-                group: null,
-                onOff: null,
                 term: null
             }
         };
     },
     computed: {
-        lightbulbs() {
-            return this.$store.getters.getLightbulbs;
+        ...mapGetters({ lightbulbs: "getLightbulbs", groups: "getGroups" }),
+        parsedGroups() {
+            return this.filterData(this.processSmarthomeData(this.groups));
+        }
+    },
+    created() {
+        this.fetchData();
+    },
+    mounted() {
+        this.eventBus.$on("refresh", this.fetchData);
+    },
+    beforeDestroy() {
+        this.eventBus.$off("refresh", this.fetchData);
+    },
+    methods: {
+        async fetchData() {
+            this.busy = true;
+            await this.$store.dispatch("fetchSmarthomeData");
+            this.busy = false;
         },
-        groups() {
-            var data = this.$store.getters.getGroups;
-            data = data.map(group => {
+        processSmarthomeData(data) {
+            return data.map(group => {
                 group.groupMember = group.groupMember
                     .map(deviceId => {
                         let devices = this.lightbulbs.filter(
@@ -142,11 +157,16 @@ export default {
                         .length > 0;
                 group.brightness =
                     group.groupMember.length > 0
-                        ? group.groupMember.reduce(
-                              (acc, currentDevice) =>
-                                  acc + currentDevice.brightness.current,
-                              0
-                          ) / group.groupMember.length
+                        ? Math.round(
+                              (group.groupMember.reduce(
+                                  (acc, currentDevice) =>
+                                      acc + currentDevice.brightness.current,
+                                  0
+                              ) /
+                                  group.groupMember.length +
+                                  Number.EPSILON) *
+                                  100
+                          ) / 100
                         : 0;
                 group.color =
                     group.groupMember.length > 0
@@ -156,24 +176,6 @@ export default {
                     group.groupMember.filter(device => device.busy).length > 0;
                 return group;
             });
-
-            return this.filterData(data);
-        }
-    },
-    created() {
-        this.fetchData();
-    },
-    mounted() {
-        this.eventBus.$on("refresh", this.fetchData);
-    },
-    beforeDestroy() {
-        this.eventBus.$off("refresh", this.fetchData);
-    },
-    methods: {
-        async fetchData() {
-            this.busy = true;
-            await this.$store.dispatch("fetchSmarthomeData");
-            this.busy = false;
         },
         toggleLightbulbs(groupId) {
             let group = this.groups.filter(group => group.id === groupId);

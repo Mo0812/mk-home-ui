@@ -2,24 +2,31 @@
     <div class="monitoring-menu">
         <b-menu class="is-custom-mobile">
             <b-menu-list label="View mode">
-                <b-menu-item icon="settings" label="Grid view"> </b-menu-item>
-                <b-menu-item
-                    icon="information-outline"
-                    label="List view"
-                    expanded
-                >
+                <b-menu-item icon="view-grid" label="Grid view"> </b-menu-item>
+                <b-menu-item icon="table-of-contents" :active="true" expanded>
+                    <template v-slot:label="props">
+                        List view
+                        <b-icon
+                            class="is-pulled-right"
+                            :icon="props.expanded ? 'menu-down' : 'menu-up'"
+                        ></b-icon>
+                    </template>
                     <b-menu-item
                         label="Lightbulbs"
+                        icon="lightbulb"
                         id="lightbulb-list"
-                        :active="active === 'lightbulb-list'"
-                        @click="setActiveMenuItem('lightbulb-list')"
+                        :active="currentRoute == '/smarthome/devices'"
+                        tag="router-link"
+                        to="/smarthome/devices"
                     >
                     </b-menu-item>
                     <b-menu-item
                         label="Groups"
+                        icon="lightbulb-group"
                         id="group-list"
-                        :active="active === 'group-list'"
-                        @click="setActiveMenuItem('group-list')"
+                        :active="currentRoute == '/smarthome/groups'"
+                        tag="router-link"
+                        to="/smarthome/groups"
                     >
                     </b-menu-item>
                 </b-menu-item>
@@ -32,20 +39,11 @@
 export default {
     name: "SmarthomeMenu",
     data() {
-        return {
-            active: "lightbulb-list"
-        };
+        return {};
     },
-    watch: {
-        active: {
-            handler(value) {
-                this.$emit("change", value);
-            }
-        }
-    },
-    methods: {
-        setActiveMenuItem(id) {
-            this.active = id;
+    computed: {
+        currentRoute() {
+            return this.$route.path;
         }
     }
 };

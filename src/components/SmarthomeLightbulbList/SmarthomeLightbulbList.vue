@@ -5,7 +5,7 @@
                 <div class="column is-three-is-one-fifth">
                     <b-select
                         placeholder="Group"
-                        icon="earth"
+                        icon="lightbulb-group"
                         v-model="filter.group"
                     >
                         <option :value="null">All</option>
@@ -20,7 +20,7 @@
                 <div class="column is-three-is-one-fifth">
                     <b-select
                         placeholder="On/Off"
-                        icon="earth"
+                        icon="lightbulb-on-outline"
                         v-model="filter.onOff"
                     >
                         <option :value="null">Both</option>

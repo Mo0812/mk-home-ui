@@ -5,17 +5,40 @@ import Smarthome from "./views/Smarthome.vue";
 Vue.use(Router);
 
 export default new Router({
+    mode: "history",
     routes: [
         {
             path: "/",
-            name: "smarthome",
-            component: Smarthome
+            name: "dashboard",
+            component: () => import("./views/Dashboard.vue")
         },
         {
             path: "/smarthome",
             name: "smarthome",
-            component: Smarthome
+            component: () => import("./views/Smarthome.vue"),
+            redirect: {
+                name: "smarthome.devices"
+            },
+            children: [
+                {
+                    path: "devices",
+                    name: "smarthome.devices",
+                    component: () =>
+                        import(
+                            "./components/SmarthomeLightbulbList/SmarthomeLightbulbList.vue"
+                        )
+                },
+                {
+                    path: "groups",
+                    name: "smarthome.groups",
+                    component: () =>
+                        import(
+                            "./components/SmarthomeGroupList/SmarthomeGroupList.vue"
+                        )
+                }
+            ]
         },
+
         {
             path: "/monitoring",
             name: "monitoring",
