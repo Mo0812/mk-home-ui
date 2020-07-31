@@ -1,42 +1,37 @@
 <template>
     <div class="smarthome-lightbulb-list">
-        <div class="filter">
-            <b-field grouped group-multiline>
-                <b-field>
-                    <b-select
-                        placeholder="Group"
-                        icon="lightbulb-group"
-                        v-model="filter.group"
-                    >
-                        <option :value="null">All</option>
-                        <option
-                            v-for="group in groups"
-                            :key="group.id"
-                            :value="group.id"
-                            >{{ group.name }}</option
-                        >
-                    </b-select>
-                </b-field>
-                <b-field>
-                    <b-select
-                        placeholder="On/Off"
-                        icon="lightbulb-on-outline"
-                        v-model="filter.onOff"
-                    >
-                        <option :value="null">Both</option>
-                        <option :value="true">On</option>
-                        <option :value="false">Off</option>
-                    </b-select>
-                </b-field>
-                <b-field expanded>
-                    <b-input
-                        placeholder="Search..."
-                        type="search"
-                        icon="magnify"
-                        v-model="filter.term"
-                    ></b-input> </b-field
-            ></b-field>
-        </div>
+        <b-form class="filter" inline>
+            <b-select
+                placeholder="Group"
+                icon="lightbulb-group"
+                v-model="filter.group"
+            >
+                <option :value="null">All</option>
+                <option
+                    v-for="group in groups"
+                    :key="group.id"
+                    :value="group.id"
+                    >{{ group.name }}</option
+                >
+            </b-select>
+
+            <b-select
+                placeholder="On/Off"
+                icon="lightbulb-on-outline"
+                v-model="filter.onOff"
+            >
+                <option :value="null">Both</option>
+                <option :value="true">On</option>
+                <option :value="false">Off</option>
+            </b-select>
+
+            <b-input
+                placeholder="Search..."
+                type="search"
+                icon="magnify"
+                v-model="filter.term"
+            ></b-input
+        ></b-form>
         <b-table
             class="lightbulb-table"
             :items="lightbulbs"
@@ -47,15 +42,12 @@
             primary-key="id"
         >
             <template v-slot:empty>
-                <section class="section">
-                    <div class="content has-text-grey has-text-centered">
-                        <p>
-                            <b-icon icon="emoticon-sad" size="is-large">
-                            </b-icon>
-                        </p>
-                        <p>Nothing here.</p>
-                    </div>
-                </section>
+                <div class="content has-text-grey has-text-centered">
+                    <p>
+                        <b-icon icon="emoticon-sad" size="is-large"> </b-icon>
+                    </p>
+                    <p>Nothing here.</p>
+                </div>
             </template>
             <template v-slot:cell(group)="data">
                 <a href="#" @click="addGroupFilter(data.item.group.id)">{{
