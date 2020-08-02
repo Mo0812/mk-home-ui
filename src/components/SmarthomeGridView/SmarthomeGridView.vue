@@ -32,9 +32,9 @@
                 v-model="filter.term"
             ></b-input
         ></b-form>
-        <b-row cols-md="3" cols-lg="4" class="px-2">
-            <b-col v-for="device in lightbulbs" :key="device.id" class="p-1">
-                <div class="bg-danger text-dark p-2">
+        <b-row cols-md="3" cols-lg="4">
+            <b-col v-for="device in lightbulbs" :key="device.id" class="py-3">
+                <div class="bg-light text-dark p-3" @click="toggleLightbulb(device.id)">
                     {{ device.name }}
                 </div>
             </b-col>
