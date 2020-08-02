@@ -36,10 +36,12 @@
             class="lightbulb-table"
             :items="lightbulbs"
             :fields="fields"
-            striped
             :busy="busy"
-            :small="true"
             primary-key="id"
+            stacked="sm"
+            small
+            striped
+            responsive
         >
             <template v-slot:empty>
                 <div class="content has-text-grey has-text-centered">

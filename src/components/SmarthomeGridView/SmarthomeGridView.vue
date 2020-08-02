@@ -1,51 +1,44 @@
 <template>
     <div class="smarthome-grid-view">
-        <div class="filter">
-            <b-field grouped group-multiline>
-                <b-field>
-                    <b-select
-                        placeholder="Group"
-                        icon="lightbulb-group"
-                        v-model="filter.group"
-                    >
-                        <option :value="null">All</option>
-                        <option
-                            v-for="group in groups"
-                            :key="group.id"
-                            :value="group.id"
-                            >{{ group.name }}</option
-                        >
-                    </b-select>
-                </b-field>
-                <b-field>
-                    <b-select
-                        placeholder="On/Off"
-                        icon="lightbulb-on-outline"
-                        v-model="filter.onOff"
-                    >
-                        <option :value="null">Both</option>
-                        <option :value="true">On</option>
-                        <option :value="false">Off</option>
-                    </b-select>
-                </b-field>
-                <b-field expanded>
-                    <b-input
-                        placeholder="Search..."
-                        type="search"
-                        icon="magnify"
-                        v-model="filter.term"
-                    ></b-input> </b-field
-            ></b-field>
-        </div>
-        <div class="tile is-ancestor">
-            <div
-                v-for="device in lightbulbs"
-                :key="device.id"
-                class="tile is-1"
+        <b-form class="filter" inline>
+            <b-select
+                placeholder="Group"
+                icon="lightbulb-group"
+                v-model="filter.group"
             >
-                {{ device.name }}
-            </div>
-        </div>
+                <option :value="null">All</option>
+                <option
+                    v-for="group in groups"
+                    :key="group.id"
+                    :value="group.id"
+                    >{{ group.name }}</option
+                >
+            </b-select>
+
+            <b-select
+                placeholder="On/Off"
+                icon="lightbulb-on-outline"
+                v-model="filter.onOff"
+            >
+                <option :value="null">Both</option>
+                <option :value="true">On</option>
+                <option :value="false">Off</option>
+            </b-select>
+
+            <b-input
+                placeholder="Search..."
+                type="search"
+                icon="magnify"
+                v-model="filter.term"
+            ></b-input
+        ></b-form>
+        <b-row cols-md="3" cols-lg="4" class="px-2">
+            <b-col v-for="device in lightbulbs" :key="device.id" class="p-1">
+                <div class="bg-danger text-dark p-2">
+                    {{ device.name }}
+                </div>
+            </b-col>
+        </b-row>
     </div>
 </template>
 
