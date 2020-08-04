@@ -66,13 +66,7 @@ export default {
         async fetchCPUData() {
             let response = await axios({
                 method: "GET",
-                url: "http://192.168.178.49:19999/api/v1/data",
-                params: {
-                    chart: "system.cpu",
-                    after: "-60",
-                    format: "json",
-                    options: "jsonwrap"
-                }
+                url: "http://192.168.178.49:8000/monitoring/history/cpu"
             });
             if (response.status == 200) {
                 let result = response.data.result;
