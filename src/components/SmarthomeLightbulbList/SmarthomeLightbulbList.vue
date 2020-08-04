@@ -158,7 +158,7 @@ export default {
         },
         changeBrightness(event, id) {
             let brightness = event;
-            this.$store.dispatch("changeBrightness", {
+            this.$store.dispatch("changeLightbulbBrightness", {
                 id: id,
                 brightness: brightness
             });

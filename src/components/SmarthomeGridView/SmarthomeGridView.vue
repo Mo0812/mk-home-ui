@@ -55,7 +55,7 @@ export default {
             this.$store.dispatch("toggleLightbulb", id);
         },
         changeBrightness(brightness, id) {
-            this.$store.dispatch("changeBrightness", {
+            this.$store.dispatch("changeLightbulbBrightness", {
                 id: id,
                 brightness: brightness
             });

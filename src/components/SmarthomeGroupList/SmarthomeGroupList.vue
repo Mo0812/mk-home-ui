@@ -38,7 +38,7 @@
                 <b-button
                     :disabled="data.item.busy"
                     variant="light"
-                    @click="toggleLightbulbs(data.item.id)"
+                    @click="toggleGroup(data.item.id)"
                 >
                     <b-icon
                         icon="power"
@@ -181,28 +181,25 @@ export default {
                 return group;
             });
         },
-        toggleLightbulbs(groupId) {
+        toggleGroup(groupId) {
             let group = this.groups.filter(group => group.id === groupId);
-            group.forEach(currentGroup =>
-                currentGroup.groupMember.forEach(device => {
-                    if (currentGroup.isOn) {
-                        this.$store.dispatch("putLightbulbOff", device.id);
-                    } else {
-                        this.$store.dispatch("putLightbulbOn", device.id);
-                    }
-                })
-            );
+            if (group.length > 0) {
+                let currentGroup = group[0];
+                if (currentGroup.isOn) {
+                    this.$store.dispatch("putGroupOff", groupId);
+                } else {
+                    this.$store.dispatch("putGroupOn", groupId);
+                }
+            }
         },
         changeBrightness(brightness, groupId) {
             let group = this.groups.filter(group => group.id === groupId);
-            group.forEach(currentGroup =>
-                currentGroup.groupMember.forEach(device => {
-                    this.$store.dispatch("changeBrightness", {
-                        id: device.id,
-                        brightness: brightness
-                    });
-                })
-            );
+            if (group.length > 0) {
+                this.$store.dispatch("changeGroupBrightness", {
+                    id: groupId,
+                    brightness: brightness
+                });
+            }
         },
         filterData(data) {
             if (this.filter.term && this.filter.term !== "") {
