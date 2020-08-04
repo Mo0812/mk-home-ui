@@ -1,37 +1,6 @@
 <template>
     <div class="smarthome-lightbulb-list">
-        <b-form class="filter" inline>
-            <b-select
-                placeholder="Group"
-                icon="lightbulb-group"
-                v-model="filter.group"
-            >
-                <option :value="null">All</option>
-                <option
-                    v-for="group in groups"
-                    :key="group.id"
-                    :value="group.id"
-                    >{{ group.name }}</option
-                >
-            </b-select>
-
-            <b-select
-                placeholder="On/Off"
-                icon="lightbulb-on-outline"
-                v-model="filter.onOff"
-            >
-                <option :value="null">Both</option>
-                <option :value="true">On</option>
-                <option :value="false">Off</option>
-            </b-select>
-
-            <b-input
-                placeholder="Search..."
-                type="search"
-                icon="magnify"
-                v-model="filter.term"
-            ></b-input
-        ></b-form>
+        <SmarthomeFilter v-model="filter" />
         <b-table
             class="lightbulb-table"
             :items="lightbulbs"
@@ -108,6 +77,7 @@
 <script>
 import View from "@/mixins/View";
 import ColorMeter from "@/components/ColorMeter/ColorMeter";
+import SmarthomeFilter from "@/components/SmarthomeFilter/SmarthomeFilter";
 
 import "./SmarthomeLightbulbList.scss";
 
@@ -115,7 +85,8 @@ export default {
     name: "SmarthomeLightbulbList",
     mixins: [View],
     components: {
-        ColorMeter
+        ColorMeter,
+        SmarthomeFilter
     },
     data() {
         return {

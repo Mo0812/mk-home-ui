@@ -12,6 +12,9 @@ Vue.config.productionTip = false;
 Vue.use(BootstrapVue);
 Vue.use(IconsPlugin);
 
+// Initial fetch
+store.dispatch("fetchSmarthomeData");
+
 const socket = new WebSocket("ws://192.168.178.49:4000");
 
 socket.addEventListener("open", () => {

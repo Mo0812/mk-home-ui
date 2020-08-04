@@ -1,45 +1,31 @@
 <template>
     <div class="monitoring-menu">
-        <b-menu class="is-custom-mobile" :accordion="false">
-            <b-menu-list label="View mode">
-                <b-menu-item
-                    icon="view-grid"
-                    label="Grid view"
-                    id="grid-view"
-                    :active="currentRoute == '/smarthome/grid'"
-                    tag="router-link"
-                    to="/smarthome/grid"
-                >
-                </b-menu-item>
-                <b-menu-item icon="table-of-contents" expanded>
-                    <template v-slot:label="props">
-                        List view
-                        <b-icon
-                            class="is-pulled-right"
-                            :icon="props.expanded ? 'menu-down' : 'menu-up'"
-                        ></b-icon>
-                    </template>
-                    <b-menu-item
-                        label="Lightbulbs"
-                        icon="lightbulb"
-                        id="lightbulb-list"
-                        :active="currentRoute == '/smarthome/devices'"
-                        tag="router-link"
-                        to="/smarthome/devices"
-                    >
-                    </b-menu-item>
-                    <b-menu-item
-                        label="Groups"
-                        icon="lightbulb-group"
-                        id="group-list"
-                        :active="currentRoute == '/smarthome/groups'"
-                        tag="router-link"
-                        to="/smarthome/groups"
-                    >
-                    </b-menu-item>
-                </b-menu-item>
-            </b-menu-list>
-        </b-menu>
+        <b-nav pills>
+            <b-nav-item
+                icon="view-grid"
+                id="grid-view"
+                :active="currentRoute == '/smarthome/grid'"
+                to="/smarthome/grid"
+            >
+                Grid view
+            </b-nav-item>
+            <b-nav-item
+                icon="lightbulb"
+                id="lightbulb-list"
+                :active="currentRoute == '/smarthome/devices'"
+                to="/smarthome/devices"
+            >
+                Lightbulbs
+            </b-nav-item>
+            <b-nav-item
+                icon="lightbulb-group"
+                id="group-list"
+                :active="currentRoute == '/smarthome/groups'"
+                to="/smarthome/groups"
+            >
+                Groups
+            </b-nav-item>
+        </b-nav>
     </div>
 </template>
 

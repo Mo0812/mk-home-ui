@@ -1,5 +1,5 @@
 <template>
-    <ViewContainer :hasSidebar="false">
+    <ViewContainer :hasSidebar="true">
         <template v-slot:sidebar>
             <SmarthomeMenu />
         </template>
