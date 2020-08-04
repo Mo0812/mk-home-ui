@@ -80,12 +80,12 @@
 
 <script>
 import { mapGetters } from "vuex";
-import View from "@/mixins/View";
+import SmarthomeView from "@/mixins/SmarthomeView";
 import ColorMeter from "@/components/ColorMeter/ColorMeter";
 
 export default {
     name: "SmarthomeGroupList",
-    mixins: [View],
+    mixins: [SmarthomeView],
     components: {
         ColorMeter
     },
@@ -121,7 +121,6 @@ export default {
                     class: "text-center"
                 }
             ],
-            busy: false,
             filter: {
                 term: null
             }
@@ -138,12 +137,6 @@ export default {
         }
     },
     created() {},
-    mounted() {
-        this.eventBus.$on("refresh", this.fetchData);
-    },
-    beforeDestroy() {
-        this.eventBus.$off("refresh", this.fetchData);
-    },
     methods: {
         processSmarthomeData(data) {
             return data.map(group => {

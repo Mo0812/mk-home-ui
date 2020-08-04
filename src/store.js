@@ -5,16 +5,23 @@ import axios from "axios";
 Vue.use(Vuex);
 
 let state = {
+    websocket: {
+        connection: false
+    },
     smarthome: {
         lightbulbs: [],
         groups: []
     }
 };
 let getters = {
+    websocketConnected: state => state.websocket.connection,
     getLightbulbs: state => state.smarthome.lightbulbs,
     getGroups: state => state.smarthome.groups
 };
 let mutations = {
+    WEBSOCKET_CONNECTION: (state, payload) => {
+        state.websocket.connection = payload;
+    },
     LIGHTBULBS: (state, payload) => {
         state.smarthome.lightbulbs = payload;
     },
@@ -70,6 +77,9 @@ let mutations = {
     }
 };
 let actions = {
+    setWebsocketConnection(context, payload) {
+        context.commit("WEBSOCKET_CONNECTION", payload);
+    },
     async fetchSmarthomeData(context, payload) {
         let response = await axios({
             method: "GET",

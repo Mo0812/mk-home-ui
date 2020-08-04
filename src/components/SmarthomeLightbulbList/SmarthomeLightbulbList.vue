@@ -75,7 +75,7 @@
 </template>
 
 <script>
-import View from "@/mixins/View";
+import SmarthomeView from "@/mixins/SmarthomeView";
 import ColorMeter from "@/components/ColorMeter/ColorMeter";
 import SmarthomeFilter from "@/components/SmarthomeFilter/SmarthomeFilter";
 
@@ -83,7 +83,7 @@ import "./SmarthomeLightbulbList.scss";
 
 export default {
     name: "SmarthomeLightbulbList",
-    mixins: [View],
+    mixins: [SmarthomeView],
     components: {
         ColorMeter,
         SmarthomeFilter
@@ -137,7 +137,6 @@ export default {
                     class: "text-center"
                 }
             ],
-            busy: false,
             filter: {
                 group: null,
                 onOff: null,
@@ -153,21 +152,7 @@ export default {
             return this.$store.getters.getGroups;
         }
     },
-    created() {
-        this.fetchData();
-    },
-    mounted() {
-        this.eventBus.$on("refresh", this.fetchData);
-    },
-    beforeDestroy() {
-        this.eventBus.$off("refresh", this.fetchData);
-    },
     methods: {
-        async fetchData() {
-            this.busy = true;
-            await this.$store.dispatch("fetchSmarthomeData");
-            this.busy = false;
-        },
         toggleLightbulb(id) {
             this.$store.dispatch("toggleLightbulb", id);
         },
