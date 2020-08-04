@@ -1,0 +1,16 @@
+.smarthome-grid-view {
+    .grid-item {
+        background-color: rgb(185, 185, 185);
+        cursor: pointer;
+
+        & > p {
+            margin: 0;
+        }
+
+        .device-name {
+            font-size: 1rem;
+            font-weight: 800;
+            margin: 0;
+        }
+    }
+}

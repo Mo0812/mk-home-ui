@@ -1,10 +1,20 @@
 <template>
     <div class="smarthome-grid-view">
-        <SmarthomeFilter v-model="filter" />
         <b-row cols-md="3" cols-lg="4" class="">
             <b-col v-for="device in lightbulbs" :key="device.id" class="py-3">
-                <div class="bg-danger text-dark p-2">
-                    {{ device.name }}
+                <div
+                    class="grid-item text-dark p-2"
+                    @click="toggleLightbulb(device.id)"
+                >
+                    <h5 class="device-name">{{ device.name }}</h5>
+                    <p class="device-group">{{ device.group.name }}</p>
+                    <p class="device-status">
+                        <b-form-checkbox
+                            v-model="device.isOn"
+                            name="device-is-on"
+                            switch
+                        />
+                    </p>
                 </div>
             </b-col>
         </b-row>
@@ -14,14 +24,14 @@
 <script>
 import SmarthomeView from "@/mixins/SmarthomeView";
 import ColorMeter from "@/components/ColorMeter/ColorMeter";
-import SmarthomeFilter from "@/components/SmarthomeFilter/SmarthomeFilter";
+
+import "./SmarthomeGridView.scss";
 
 export default {
     name: "SmarthomeGridView",
     mixins: [SmarthomeView],
     components: {
-        ColorMeter,
-        SmarthomeFilter
+        ColorMeter
     },
     data() {
         return {
@@ -34,7 +44,7 @@ export default {
     },
     computed: {
         lightbulbs() {
-            return this.filterData(this.$store.getters.getLightbulbs);
+            return this.$store.getters.getLightbulbs;
         },
         groups() {
             return this.$store.getters.getGroups;
@@ -49,30 +59,6 @@ export default {
                 id: id,
                 brightness: brightness
             });
-        },
-        filterData(data) {
-            if (this.filter.group) {
-                data = data.filter(item => item.group.id === this.filter.group);
-            }
-            if (this.filter.onOff !== null) {
-                data = data.filter(item => item.isOn === this.filter.onOff);
-                console.log(data);
-            }
-            if (this.filter.term && this.filter.term !== "") {
-                data = data.filter(
-                    item =>
-                        item.name
-                            .toLowerCase()
-                            .includes(this.filter.term.toLowerCase()) ||
-                        item.group.name
-                            .toLowerCase()
-                            .includes(this.filter.term.toLowerCase())
-                );
-            }
-            return data;
-        },
-        addGroupFilter(groupId) {
-            this.filter.group = groupId;
         }
     }
 };
