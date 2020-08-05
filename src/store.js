@@ -11,6 +11,10 @@ let state = {
     smarthome: {
         lightbulbs: [],
         groups: []
+    },
+    system: {
+        metrics: {},
+        controls: {}
     }
 };
 let getters = {
