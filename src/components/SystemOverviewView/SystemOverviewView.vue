@@ -1,5 +1,5 @@
 <template>
-    <section class="monitoring">
+    <section class="system-overview">
         <LineChart
             v-if="data.cpu.loaded"
             :chartdata="data.cpu.chartData"

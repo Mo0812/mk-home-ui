@@ -1,31 +1,50 @@
 <template>
     <div class="smarthome-menu">
-        <b-nav vertical pills>
-            <b-nav-item
-                icon="view-grid"
-                id="grid-view"
-                :active="currentRoute == '/smarthome/grid'"
-                to="/smarthome/grid"
-            >
-                Grid view
-            </b-nav-item>
-            <b-nav-item
-                icon="lightbulb"
-                id="lightbulb-list"
-                :active="currentRoute == '/smarthome/devices'"
-                to="/smarthome/devices"
-            >
-                Lightbulbs
-            </b-nav-item>
-            <b-nav-item
-                icon="lightbulb-group"
-                id="group-list"
-                :active="currentRoute == '/smarthome/groups'"
-                to="/smarthome/groups"
-            >
-                Groups
-            </b-nav-item>
-        </b-nav>
+        <article class="views">
+            <h5 class="small">Views</h5>
+            <b-nav vertical pills>
+                <b-nav-item
+                    icon="view-grid"
+                    :active="currentRoute == '/smarthome/views/grid'"
+                    to="/smarthome/views/grid"
+                >
+                    Grid view
+                </b-nav-item>
+                <b-nav-item
+                    icon="lightbulb"
+                    :active="currentRoute == '/smarthome/views/devices'"
+                    to="/smarthome/views/devices"
+                >
+                    Lightbulbs
+                </b-nav-item>
+                <b-nav-item
+                    icon="lightbulb-group"
+                    :active="currentRoute == '/smarthome/views/groups'"
+                    to="/smarthome/views/groups"
+                >
+                    Groups
+                </b-nav-item>
+            </b-nav>
+        </article>
+        <article class="automation">
+            <h5 class="small">Automation</h5>
+            <b-nav vertical pills>
+                <b-nav-item
+                    icon="view-grid"
+                    :active="currentRoute == '/smarthome/automation/time'"
+                    to="/smarthome/automation/time"
+                >
+                    Time based
+                </b-nav-item>
+                <b-nav-item
+                    icon="lightbulb"
+                    :active="currentRoute == '/smarthome/automation/ambient'"
+                    to="/smarthome/automation/ambient"
+                >
+                    Ambient based
+                </b-nav-item>
+            </b-nav>
+        </article>
     </div>
 </template>
 

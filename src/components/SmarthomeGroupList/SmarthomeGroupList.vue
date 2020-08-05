@@ -55,7 +55,7 @@
                         :min="0"
                         :max="100"
                         :disabled="data.item.busy"
-                        variant="is-warning"
+                        variant="warning"
                         @change="changeBrightness($event, data.item.id)"
                         lazy
                     /><span class="tag"

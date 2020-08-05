@@ -20,7 +20,8 @@ let state = {
 let getters = {
     websocketConnected: state => state.websocket.connection,
     getLightbulbs: state => state.smarthome.lightbulbs,
-    getGroups: state => state.smarthome.groups
+    getGroups: state => state.smarthome.groups,
+    getSystemControls: state => state.system.controls
 };
 let mutations = {
     WEBSOCKET_CONNECTION: (state, payload) => {
@@ -78,6 +79,9 @@ let mutations = {
             currentLightbulb.brightness.current = payload.brightness.initial;
             currentLightbulb.busy = false;
         }
+    },
+    SYSTEM_CONTROLS: (state, payload) => {
+        state.system.controls = payload;
     }
 };
 let actions = {
@@ -243,6 +247,46 @@ let actions = {
                         }
                     })
                 );
+        }
+    },
+    async fetchSystemControls(context, payload) {
+        let response = await axios({
+            method: "GET",
+            url: "http://192.168.178.49:8000/system/display/status"
+        });
+        if (response.status == 200) {
+            context.commit("SYSTEM_CONTROLS", response.data);
+        }
+    },
+    async putDisplayOnOff(context, payload) {
+        try {
+            const response = await axios({
+                method: "PUT",
+                url:
+                    "http://192.168.178.49:8000/system/display/" +
+                    (payload ? "on" : "off")
+            });
+            context.commit("SYSTEM_CONTROLS", response.data);
+        } catch (e) {
+            context.commit(
+                "SYSTEM_CONTROLS",
+                context.getters.getSystemControls
+            );
+        }
+    },
+    async changeDisplayBrightness(context, payload) {
+        try {
+            const response = await axios({
+                method: "PUT",
+                url: "http://192.168.178.49:8000/system/display/brightness",
+                data: { brightness: payload }
+            });
+            context.commit("SYSTEM_CONTROLS", response.data);
+        } catch (e) {
+            context.commit(
+                "SYSTEM_CONTROLS",
+                context.getters.getSystemControls
+            );
         }
     }
 };

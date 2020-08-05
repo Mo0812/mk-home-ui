@@ -4,7 +4,8 @@ import ViewContainer from "@/components/ViewContainer/ViewContainer";
 export default {
     data() {
         return {
-            eventBus: EventBus
+            eventBus: EventBus,
+            busy: false
         };
     },
     components: {

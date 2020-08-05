@@ -1,5 +1,5 @@
 <template>
-    <section class="sidebar-container">
+    <aside class="sidebar-container">
         <slot>
             <b-menu class="is-custom-mobile">
                 <b-menu-list label="Menu">
@@ -43,7 +43,7 @@
                 </b-menu-list>
             </b-menu>
         </slot>
-    </section>
+    </aside>
 </template>
 
 <script>

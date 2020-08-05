@@ -16,31 +16,49 @@ export default new Router({
             name: "smarthome",
             component: () => import("./views/Smarthome.vue"),
             redirect: {
-                name: "smarthome.devices"
+                name: "smarthome.views.devices"
             },
             children: [
                 {
-                    path: "grid",
-                    name: "smarthome.grid",
+                    path: "views/grid",
+                    name: "smarthome.views.grid",
                     component: () =>
                         import(
                             "./components/SmarthomeGridView/SmarthomeGridView.vue"
                         )
                 },
                 {
-                    path: "devices",
-                    name: "smarthome.devices",
+                    path: "views/devices",
+                    alias: "views",
+                    name: "smarthome.views.devices",
                     component: () =>
                         import(
                             "./components/SmarthomeLightbulbList/SmarthomeLightbulbList.vue"
                         )
                 },
                 {
-                    path: "groups",
-                    name: "smarthome.groups",
+                    path: "views/groups",
+                    name: "smarthome.views.groups",
                     component: () =>
                         import(
                             "./components/SmarthomeGroupList/SmarthomeGroupList.vue"
+                        )
+                },
+                {
+                    path: "automation/time",
+                    alias: "automation",
+                    name: "smarthome.automation.time",
+                    component: () =>
+                        import(
+                            "./components/SmarthomeGridView/SmarthomeGridView.vue"
+                        )
+                },
+                {
+                    path: "automation/ambient",
+                    name: "smarthome.automation.ambient",
+                    component: () =>
+                        import(
+                            "./components/SmarthomeLightbulbList/SmarthomeLightbulbList.vue"
                         )
                 }
             ]
@@ -74,7 +92,7 @@ export default new Router({
                     name: "system.controls",
                     component: () =>
                         import(
-                            "./components/SystemOverviewView/SystemOverviewView.vue"
+                            "./components/SystemControlView/SystemControlView.vue"
                         )
                 }
             ]

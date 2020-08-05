@@ -3,9 +3,7 @@ import View from "@/mixins/View";
 export default {
     mixins: [View],
     data() {
-        return {
-            busy: false
-        };
+        return {};
     },
     created() {
         this.fetchData();
