@@ -1,39 +1,35 @@
 <template>
-    <ViewContainer>
-        <template v-slot:sidebar><MonitoringMenu /></template>
-        <section class="monitoring">
-            <LineChart
-                v-if="data.cpu.loaded"
-                :chartdata="data.cpu.chartData"
-                :options="data.cpu.options"
-                :height="100"
-            />
-            <LineChart
-                v-if="data.ram.loaded"
-                :chartdata="data.ram.chartData"
-                :options="data.ram.options"
-                :height="100"
-            />
-            <LineChart
-                v-if="data.temperature.loaded"
-                :chartdata="data.temperature.chartData"
-                :options="data.temperature.options"
-                :height="100"
-            /></section
-    ></ViewContainer>
+    <section class="monitoring">
+        <LineChart
+            v-if="data.cpu.loaded"
+            :chartdata="data.cpu.chartData"
+            :options="data.cpu.options"
+            :height="100"
+        />
+        <LineChart
+            v-if="data.ram.loaded"
+            :chartdata="data.ram.chartData"
+            :options="data.ram.options"
+            :height="100"
+        />
+        <LineChart
+            v-if="data.temperature.loaded"
+            :chartdata="data.temperature.chartData"
+            :options="data.temperature.options"
+            :height="100"
+        />
+    </section>
 </template>
 
 <script>
 import axios from "axios";
 import View from "@/mixins/View";
-import MonitoringMenu from "@/components/MonitoringMenu/MonitoringMenu";
 import LineChart from "@/components/LineChart/LineChart";
 
 export default {
-    name: "monitoring",
+    name: "SystemOverviewView",
     mixins: [View],
     components: {
-        MonitoringMenu,
         LineChart
     },
     data() {

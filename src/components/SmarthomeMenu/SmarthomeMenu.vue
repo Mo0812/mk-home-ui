@@ -1,6 +1,6 @@
 <template>
-    <div class="monitoring-menu">
-        <b-nav pills>
+    <div class="smarthome-menu">
+        <b-nav vertical pills>
             <b-nav-item
                 icon="view-grid"
                 id="grid-view"

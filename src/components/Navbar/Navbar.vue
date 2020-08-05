@@ -18,8 +18,8 @@
                         >Smarthome</b-nav-item
                     >
                     <b-nav-item
-                        :active="currentRoute === '/monitoring'"
-                        to="/monitoring"
+                        :active="currentRoute === '/system'"
+                        to="/system"
                         >System</b-nav-item
                     >
                     <b-nav-item
