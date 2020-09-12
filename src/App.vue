@@ -1,12 +1,8 @@
 <template>
-    <div id="app" class="container is-fluid">
-        <link
-            rel="stylesheet"
-            href="https://cdn.materialdesignicons.com/5.3.45/css/materialdesignicons.min.css"
-        />
+    <div id="app">
         <Navbar />
         <main class="main-view">
-            <router-view />
+            <b-container fluid> <router-view /></b-container>
         </main>
     </div>
 </template>

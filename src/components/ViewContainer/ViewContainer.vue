@@ -1,13 +1,13 @@
 <template>
     <div class="view-container">
-        <div class="columns">
-            <div v-if="hasSidebar" class="column is-one-quarter">
+        <b-row>
+            <b-col v-if="hasSidebar" cols="2">
                 <Sidebar>
                     <slot name="sidebar"></slot>
                 </Sidebar>
-            </div>
-            <div class="column"><slot></slot></div>
-        </div>
+            </b-col>
+            <b-col><slot></slot></b-col>
+        </b-row>
     </div>
 </template>
 

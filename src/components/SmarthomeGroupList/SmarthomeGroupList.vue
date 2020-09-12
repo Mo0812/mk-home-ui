@@ -1,6 +1,6 @@
 <template>
     <div class="smarthome-lightbulb-list">
-        <!--<div class="filter">
+        <div class="filter">
             <div class="columns">
                 <div class="column full">
                     <b-input
@@ -11,12 +11,17 @@
                     ></b-input>
                 </div>
             </div>
-        </div>-->
+        </div>
         <b-table
-            :data="parsedGroups"
-            :striped="true"
-            :hoverable="true"
-            :loading="busy"
+            class="lightbulb-table"
+            :items="groups"
+            :fields="fields"
+            :busy="busy"
+            primary-key="id"
+            stacked="sm"
+            small
+            striped
+            responsive
         >
             <template v-slot:empty>
                 <section class="section">
@@ -29,66 +34,45 @@
                     </div>
                 </section>
             </template>
-            <template slot-scope="props">
-                <b-table-column field="id" label="ID" sortable>
-                    {{ props.row.id }}
-                </b-table-column>
-                <b-table-column field="name" label="Name" sortable>
-                    {{ props.row.name }}
-                </b-table-column>
-                <!--<b-table-column field="group" label="Gruppe" sortable>
-                    <a href="#" @click="addGroupFilter(props.row.group.id)">{{
-                        props.row.group.name
-                    }}</a>
-                </b-table-column>-->
-                <b-table-column
-                    field="isOn"
-                    label="eingeschaltet"
-                    centered
-                    sortable
+            <template v-slot:cell(isOn)="data">
+                <b-button
+                    :disabled="data.item.busy"
+                    variant="light"
+                    @click="toggleGroup(data.item.id)"
                 >
-                    <b-button
-                        :disabled="props.row.busy"
-                        @click="toggleLightbulbs(props.row.id)"
-                    >
-                        <b-icon
-                            icon="power"
-                            :type="props.row.isOn ? 'is-success' : 'is-danger'"
-                        />
-                    </b-button>
-                </b-table-column>
-                <b-table-column field="brightness" label="Helligkeit" centered>
-                    <template v-if="props.row.isDimmable">
-                        <b-slider
-                            :style="{ margin: '0.5rem 0' }"
-                            :value="props.row.brightness"
-                            :min="0"
-                            :max="100"
-                            :disabled="props.row.busy"
-                            type="is-warning"
-                            @change="changeBrightness($event, props.row.id)"
-                            lazy
-                        /><span class="tag"
-                            >{{ props.row.brightness }}%</span
-                        ></template
-                    >
-                    <template v-else>
-                        <span class="tag">Gerät nicht dimmbar</span>
-                    </template>
-                </b-table-column>
-                <b-table-column
-                    field="color"
-                    label="Lichtfarbe"
-                    centered
-                    sortable
+                    <b-icon
+                        icon="power"
+                        :variant="data.item.isOn ? 'success' : 'danger'"
+                    />
+                </b-button>
+            </template>
+            <template v-slot:cell(brightness)="data">
+                <template v-if="data.item.isDimmable">
+                    <b-input
+                        class="brightness-switcher"
+                        type="range"
+                        :value="data.item.brightness"
+                        :min="0"
+                        :max="100"
+                        :disabled="data.item.busy"
+                        variant="warning"
+                        @change="changeBrightness($event, data.item.id)"
+                        lazy
+                    /><span class="tag"
+                        >{{ data.item.brightness }}%</span
+                    ></template
                 >
-                    <template v-if="props.row.color">
-                        <ColorMeter :color="props.row.color"
-                    /></template>
-                    <template v-else>
-                        <span class="tag">Lichtfarbe nicht definiert</span>
-                    </template>
-                </b-table-column>
+                <template v-else>
+                    <span class="tag">Gerät nicht dimmbar</span>
+                </template>
+            </template>
+            <template v-slot:cell(color)="data">
+                <template v-if="data.item.color">
+                    <ColorMeter :color="data.item.color"
+                /></template>
+                <template v-else>
+                    <span class="tag">Lichtfarbe nicht definiert</span>
+                </template>
             </template>
         </b-table>
     </div>
@@ -96,44 +80,64 @@
 
 <script>
 import { mapGetters } from "vuex";
-import View from "@/mixins/View";
+import SmarthomeView from "@/mixins/SmarthomeView";
 import ColorMeter from "@/components/ColorMeter/ColorMeter";
 
 export default {
     name: "SmarthomeGroupList",
-    mixins: [View],
+    mixins: [SmarthomeView],
     components: {
         ColorMeter
     },
     data() {
         return {
-            busy: false,
+            fields: [
+                {
+                    key: "id",
+                    label: "ID",
+                    sortable: true
+                },
+                {
+                    key: "name",
+                    label: "Name",
+                    sortable: true
+                },
+                {
+                    key: "isOn",
+                    label: "activated",
+                    sortable: true,
+                    class: "text-center"
+                },
+                {
+                    key: "brightness",
+                    label: "Brightness",
+                    sortable: false,
+                    class: "text-center"
+                },
+                {
+                    key: "color",
+                    label: "Color",
+                    sortable: false,
+                    class: "text-center"
+                }
+            ],
             filter: {
                 term: null
             }
         };
     },
     computed: {
-        ...mapGetters({ lightbulbs: "getLightbulbs", groups: "getGroups" }),
-        parsedGroups() {
-            return this.filterData(this.processSmarthomeData(this.groups));
+        ...mapGetters({ lightbulbs: "getLightbulbs", rawGroups: "getGroups" }),
+        groups() {
+            return this.filterData(
+                this.processSmarthomeData(
+                    JSON.parse(JSON.stringify(this.rawGroups))
+                )
+            );
         }
     },
-    created() {
-        this.fetchData();
-    },
-    mounted() {
-        this.eventBus.$on("refresh", this.fetchData);
-    },
-    beforeDestroy() {
-        this.eventBus.$off("refresh", this.fetchData);
-    },
+    created() {},
     methods: {
-        async fetchData() {
-            this.busy = true;
-            await this.$store.dispatch("fetchSmarthomeData");
-            this.busy = false;
-        },
         processSmarthomeData(data) {
             return data.map(group => {
                 group.groupMember = group.groupMember
@@ -177,28 +181,25 @@ export default {
                 return group;
             });
         },
-        toggleLightbulbs(groupId) {
+        toggleGroup(groupId) {
             let group = this.groups.filter(group => group.id === groupId);
-            group.forEach(currentGroup =>
-                currentGroup.groupMember.forEach(device => {
-                    if (currentGroup.isOn) {
-                        this.$store.dispatch("putLightbulbOff", device.id);
-                    } else {
-                        this.$store.dispatch("putLightbulbOn", device.id);
-                    }
-                })
-            );
+            if (group.length > 0) {
+                let currentGroup = group[0];
+                if (currentGroup.isOn) {
+                    this.$store.dispatch("putGroupOff", groupId);
+                } else {
+                    this.$store.dispatch("putGroupOn", groupId);
+                }
+            }
         },
         changeBrightness(brightness, groupId) {
             let group = this.groups.filter(group => group.id === groupId);
-            group.forEach(currentGroup =>
-                currentGroup.groupMember.forEach(device => {
-                    this.$store.dispatch("changeBrightness", {
-                        id: device.id,
-                        brightness: brightness
-                    });
-                })
-            );
+            if (group.length > 0) {
+                this.$store.dispatch("changeGroupBrightness", {
+                    id: groupId,
+                    brightness: brightness
+                });
+            }
         },
         filterData(data) {
             if (this.filter.term && this.filter.term !== "") {

@@ -5,16 +5,28 @@ import axios from "axios";
 Vue.use(Vuex);
 
 let state = {
+    websocket: {
+        connection: false
+    },
     smarthome: {
         lightbulbs: [],
         groups: []
+    },
+    system: {
+        metrics: {},
+        controls: {}
     }
 };
 let getters = {
+    websocketConnected: state => state.websocket.connection,
     getLightbulbs: state => state.smarthome.lightbulbs,
-    getGroups: state => state.smarthome.groups
+    getGroups: state => state.smarthome.groups,
+    getSystemControls: state => state.system.controls
 };
 let mutations = {
+    WEBSOCKET_CONNECTION: (state, payload) => {
+        state.websocket.connection = payload;
+    },
     LIGHTBULBS: (state, payload) => {
         state.smarthome.lightbulbs = payload;
     },
@@ -67,13 +79,19 @@ let mutations = {
             currentLightbulb.brightness.current = payload.brightness.initial;
             currentLightbulb.busy = false;
         }
+    },
+    SYSTEM_CONTROLS: (state, payload) => {
+        state.system.controls = payload;
     }
 };
 let actions = {
+    setWebsocketConnection(context, payload) {
+        context.commit("WEBSOCKET_CONNECTION", payload);
+    },
     async fetchSmarthomeData(context, payload) {
         let response = await axios({
             method: "GET",
-            url: "http://192.168.178.49:8000/list"
+            url: "http://192.168.178.49:8000/smarthome/list"
         });
         if (response.status == 200) {
             let groups = Object.entries(response.data.groups).map(
@@ -119,7 +137,7 @@ let actions = {
         try {
             await axios({
                 method: "PUT",
-                url: "http://192.168.178.49:8000/toggle",
+                url: "http://192.168.178.49:8000/smarthome/device/toggle",
                 data: { device: payload }
             });
 
@@ -130,7 +148,7 @@ let actions = {
         try {
             await axios({
                 method: "PUT",
-                url: "http://192.168.178.49:8000/on",
+                url: "http://192.168.178.49:8000/smarthome/device/on",
                 data: { device: payload }
             });
 
@@ -144,26 +162,131 @@ let actions = {
         try {
             await axios({
                 method: "PUT",
-                url: "http://192.168.178.49:8000/off",
+                url: "http://192.168.178.49:8000/smarthome/device/off",
                 data: { device: payload }
             });
 
             context.commit("UPDATE_LIGHTBULB_ONOFF", {
                 id: payload,
-                isOn: falase
+                isOn: false
             });
         } catch (e) {}
     },
-    async changeBrightness(context, payload) {
+    async changeLightbulbBrightness(context, payload) {
         try {
             await axios({
                 method: "PUT",
-                url: "http://192.168.178.49:8000/brightness",
+                url: "http://192.168.178.49:8000/smarthome/device/brightness",
                 data: { device: payload.id, brightness: payload.brightness }
             });
             context.commit("UPDATE_LIGHTBULB_BRIGHTNESS", payload);
         } catch (e) {
             context.commit("RESET_LIGHTBULB_BRIGHTNESS", payload);
+        }
+    },
+    async putGroupOn(context, payload) {
+        try {
+            await axios({
+                method: "PUT",
+                url: "http://192.168.178.49:8000/smarthome/group/on",
+                data: { group: payload }
+            });
+
+            context.getters.getLightbulbs
+                .filter(lightbulb => lightbulb.group.id === payload)
+                .forEach(lightbulb =>
+                    context.commit("UPDATE_LIGHTBULB_ONOFF", {
+                        id: lightbulb.id,
+                        isOn: true
+                    })
+                );
+        } catch (e) {}
+    },
+    async putGroupOff(context, payload) {
+        try {
+            await axios({
+                method: "PUT",
+                url: "http://192.168.178.49:8000/smarthome/group/off",
+                data: { group: payload }
+            });
+
+            context.getters.getLightbulbs
+                .filter(lightbulb => lightbulb.group.id === payload)
+                .forEach(lightbulb =>
+                    context.commit("UPDATE_LIGHTBULB_ONOFF", {
+                        id: lightbulb.id,
+                        isOn: false
+                    })
+                );
+        } catch (e) {}
+    },
+    async changeGroupBrightness(context, payload) {
+        try {
+            await axios({
+                method: "PUT",
+                url: "http://192.168.178.49:8000/smarthome/group/brightness",
+                data: { group: payload.id, brightness: payload.brightness }
+            });
+            context.getters.getLightbulbs
+                .filter(lightbulb => lightbulb.group.id === payload.id)
+                .forEach(lightbulb =>
+                    context.commit("UPDATE_LIGHTBULB_BRIGHTNESS", {
+                        id: lightbulb.id,
+                        brightness: payload.brightness
+                    })
+                );
+        } catch (e) {
+            context.getters.getLightbulbs
+                .filter(lightbulb => lightbulb.group.id === payload.id)
+                .forEach(lightbulb =>
+                    context.commit("RESET_LIGHTBULB_BRIGHTNESS", {
+                        id: lightbulb.id,
+                        brightness: {
+                            initial: lightbulb.brightness.initial,
+                            current: payload.brightness
+                        }
+                    })
+                );
+        }
+    },
+    async fetchSystemControls(context, payload) {
+        let response = await axios({
+            method: "GET",
+            url: "http://192.168.178.49:8000/system/display/status"
+        });
+        if (response.status == 200) {
+            context.commit("SYSTEM_CONTROLS", response.data);
+        }
+    },
+    async putDisplayOnOff(context, payload) {
+        try {
+            const response = await axios({
+                method: "PUT",
+                url:
+                    "http://192.168.178.49:8000/system/display/" +
+                    (payload ? "on" : "off")
+            });
+            context.commit("SYSTEM_CONTROLS", response.data);
+        } catch (e) {
+            context.commit(
+                "SYSTEM_CONTROLS",
+                context.getters.getSystemControls
+            );
+        }
+    },
+    async changeDisplayBrightness(context, payload) {
+        try {
+            const response = await axios({
+                method: "PUT",
+                url: "http://192.168.178.49:8000/system/display/brightness",
+                data: { brightness: payload }
+            });
+            context.commit("SYSTEM_CONTROLS", response.data);
+        } catch (e) {
+            context.commit(
+                "SYSTEM_CONTROLS",
+                context.getters.getSystemControls
+            );
         }
     }
 };
