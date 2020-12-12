@@ -94,6 +94,11 @@ export default new Router({
                         import(
                             "./components/SystemControlView/SystemControlView.vue"
                         )
+                },
+                {
+                    path: "log",
+                    name: "system.log",
+                    component: () => import("./components/LogView/LogView.vue")
                 }
             ]
         },

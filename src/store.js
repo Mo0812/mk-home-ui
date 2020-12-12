@@ -17,13 +17,18 @@ let state = {
     system: {
         metrics: {},
         controls: {}
+    },
+    log: {
+        app: [],
+        error: []
     }
 };
 let getters = {
     websocketConnected: state => state.websocket.connection,
     getLightbulbs: state => state.smarthome.lightbulbs,
     getGroups: state => state.smarthome.groups,
-    getSystemControls: state => state.system.controls
+    getSystemControls: state => state.system.controls,
+    getLog: state => state.log
 };
 let mutations = {
     WEBSOCKET_CONNECTION: (state, payload) => {
@@ -84,6 +89,12 @@ let mutations = {
     },
     SYSTEM_CONTROLS: (state, payload) => {
         state.system.controls = payload;
+    },
+    APP_LOG: (state, payload) => {
+        state.log.app = payload;
+    },
+    ERROR_LOG: (state, payload) => {
+        state.log.error = payload;
     }
 };
 let actions = {
@@ -264,9 +275,7 @@ let actions = {
         try {
             const response = await axios({
                 method: "PUT",
-                url:
-                    `${url}/system/display/` +
-                    (payload ? "on" : "off")
+                url: `${url}/system/display/` + (payload ? "on" : "off")
             });
             context.commit("SYSTEM_CONTROLS", response.data);
         } catch (e) {
@@ -289,6 +298,24 @@ let actions = {
                 "SYSTEM_CONTROLS",
                 context.getters.getSystemControls
             );
+        }
+    },
+    async fetchAppLog(context) {
+        let response = await axios({
+            method: "GET",
+            url: `${url}/logging/app`
+        });
+        if (response.status == 200) {
+            context.commit("APP_LOG", response.data);
+        }
+    },
+    async fetchErrorLog(context) {
+        let response = await axios({
+            method: "GET",
+            url: `${url}/logging/error`
+        });
+        if (response.status == 200) {
+            context.commit("ERROR_LOG", response.data);
         }
     }
 };

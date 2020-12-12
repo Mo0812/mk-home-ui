@@ -23,16 +23,13 @@
 
 <script>
 import SmarthomeView from "@/mixins/SmarthomeView";
-import ColorMeter from "@/components/ColorMeter/ColorMeter";
 
 import "./SmarthomeGridView.scss";
 
 export default {
     name: "SmarthomeGridView",
     mixins: [SmarthomeView],
-    components: {
-        ColorMeter
-    },
+    components: {},
     data() {
         return {
             filter: {

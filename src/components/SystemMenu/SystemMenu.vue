@@ -19,6 +19,12 @@
                 to="/system/controls"
                 >Controls</b-nav-item
             >
+            <b-nav-item
+                icon="speedometer"
+                :active="currentRoute == '/system/log'"
+                to="/system/log"
+                >Logs</b-nav-item
+            >
         </b-nav>
     </div>
 </template>
