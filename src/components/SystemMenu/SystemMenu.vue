@@ -21,6 +21,12 @@
             >
             <b-nav-item
                 icon="speedometer"
+                :active="currentRoute == '/system/devices'"
+                to="/system/devices"
+                >Devices</b-nav-item
+            >
+            <b-nav-item
+                icon="speedometer"
                 :active="currentRoute == '/system/log'"
                 to="/system/log"
                 >Logs</b-nav-item
@@ -35,7 +41,7 @@ export default {
     computed: {
         currentRoute() {
             return this.$route.path;
-        }
-    }
+        },
+    },
 };
 </script>

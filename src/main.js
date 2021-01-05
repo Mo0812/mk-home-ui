@@ -12,7 +12,7 @@ Vue.config.productionTip = false;
 Vue.use(BootstrapVue);
 Vue.use(IconsPlugin);
 
-const socket = new WebSocket(`ws://${process.env.VUE_APP_WS_URL}:4000`);
+const socket = new WebSocket(`ws://${process.env.VUE_APP_WS_URL}`);
 
 socket.addEventListener("open", () => {
     socket.send("Requesting connection");

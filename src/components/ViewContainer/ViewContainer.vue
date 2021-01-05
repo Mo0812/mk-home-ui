@@ -6,7 +6,7 @@
                     <slot name="sidebar"></slot>
                 </Sidebar>
             </b-col>
-            <b-col><slot></slot></b-col>
+            <b-col cols="10"><slot></slot></b-col>
         </b-row>
     </div>
 </template>

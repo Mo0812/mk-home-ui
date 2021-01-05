@@ -45,7 +45,11 @@
                         id="displayBrightness"
                         class="brightness-switcher"
                         type="range"
-                        :value="controls.display.brightness.current"
+                        :value="
+                            controls.display.brightness
+                                ? controls.display.brightness.current
+                                : 0
+                        "
                         :min="0"
                         :max="255"
                         variant="warning"
@@ -54,15 +58,15 @@
                     />
                     <span class="tag"
                         >{{
-                            controls.display.brightness.percentage * 100
+                            controls.display.brightness
+                                ? controls.display.brightness.percentage * 100
+                                : 0
                         }}
                         %</span
                     >
                 </b-form-group>
             </template>
-            <template v-else-if="busy">
-                Lädt...
-            </template>
+            <template v-else-if="busy"> Lädt... </template>
             <template v-else>
                 <b-alert variant="warning" show
                     >Keine Informationen gefunden</b-alert
@@ -80,7 +84,7 @@ export default {
     name: "SystemControlView",
     mixins: [View],
     computed: {
-        ...mapGetters({ controls: "getSystemControls" })
+        ...mapGetters({ controls: "getSystemControls" }),
     },
     created() {
         this.fetchData();
@@ -106,7 +110,7 @@ export default {
             this.busy = true;
             await this.$store.dispatch("changeDisplayBrightness", val);
             this.busy = false;
-        }
-    }
+        },
+    },
 };
 </script>

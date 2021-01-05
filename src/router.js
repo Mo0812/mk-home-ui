@@ -9,14 +9,14 @@ export default new Router({
         {
             path: "/",
             name: "dashboard",
-            component: () => import("./views/Dashboard.vue")
+            component: () => import("./views/Dashboard.vue"),
         },
         {
             path: "/smarthome",
             name: "smarthome",
             component: () => import("./views/Smarthome.vue"),
             redirect: {
-                name: "smarthome.views.devices"
+                name: "smarthome.views.devices",
             },
             children: [
                 {
@@ -25,7 +25,7 @@ export default new Router({
                     component: () =>
                         import(
                             "./components/SmarthomeGridView/SmarthomeGridView.vue"
-                        )
+                        ),
                 },
                 {
                     path: "views/devices",
@@ -34,7 +34,7 @@ export default new Router({
                     component: () =>
                         import(
                             "./components/SmarthomeLightbulbList/SmarthomeLightbulbList.vue"
-                        )
+                        ),
                 },
                 {
                     path: "views/groups",
@@ -42,7 +42,7 @@ export default new Router({
                     component: () =>
                         import(
                             "./components/SmarthomeGroupList/SmarthomeGroupList.vue"
-                        )
+                        ),
                 },
                 {
                     path: "automation/time",
@@ -51,7 +51,7 @@ export default new Router({
                     component: () =>
                         import(
                             "./components/SmarthomeGridView/SmarthomeGridView.vue"
-                        )
+                        ),
                 },
                 {
                     path: "automation/ambient",
@@ -59,16 +59,16 @@ export default new Router({
                     component: () =>
                         import(
                             "./components/SmarthomeLightbulbList/SmarthomeLightbulbList.vue"
-                        )
-                }
-            ]
+                        ),
+                },
+            ],
         },
         {
             path: "/system",
             name: "system",
             component: () => import("./views/System.vue"),
             redirect: {
-                name: "system.overview"
+                name: "system.overview",
             },
             children: [
                 {
@@ -77,15 +77,15 @@ export default new Router({
                     component: () =>
                         import(
                             "./components/SystemOverviewView/SystemOverviewView.vue"
-                        )
+                        ),
                 },
                 {
                     path: "metrics",
                     name: "system.metrics",
                     component: () =>
                         import(
-                            "./components/SystemOverviewView/SystemOverviewView.vue"
-                        )
+                            "./components/SystemMetricsView/SystemMetricsView.vue"
+                        ),
                 },
                 {
                     path: "controls",
@@ -93,14 +93,22 @@ export default new Router({
                     component: () =>
                         import(
                             "./components/SystemControlView/SystemControlView.vue"
-                        )
+                        ),
+                },
+                {
+                    path: "devices",
+                    name: "system.devices",
+                    component: () =>
+                        import(
+                            "./components/SystemDeviceView/SystemDeviceView.vue"
+                        ),
                 },
                 {
                     path: "log",
                     name: "system.log",
-                    component: () => import("./components/LogView/LogView.vue")
-                }
-            ]
+                    component: () => import("./components/LogView/LogView.vue"),
+                },
+            ],
         },
         {
             path: "/settings",
@@ -108,7 +116,7 @@ export default new Router({
             // route level code-splitting
             // this generates a separate chunk (about.[hash].js) for this route
             // which is lazy-loaded when the route is visited.
-            component: () => import("./views/Settings.vue")
-        }
-    ]
+            component: () => import("./views/Settings.vue"),
+        },
+    ],
 });

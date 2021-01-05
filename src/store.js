@@ -8,27 +8,29 @@ Vue.use(Vuex);
 
 let state = {
     websocket: {
-        connection: false
+        connection: false,
     },
     smarthome: {
         lightbulbs: [],
-        groups: []
+        groups: [],
     },
     system: {
         metrics: {},
-        controls: {}
+        controls: {},
+        devices: [],
     },
     log: {
         app: [],
-        error: []
-    }
+        error: [],
+    },
 };
 let getters = {
-    websocketConnected: state => state.websocket.connection,
-    getLightbulbs: state => state.smarthome.lightbulbs,
-    getGroups: state => state.smarthome.groups,
-    getSystemControls: state => state.system.controls,
-    getLog: state => state.log
+    websocketConnected: (state) => state.websocket.connection,
+    getLightbulbs: (state) => state.smarthome.lightbulbs,
+    getGroups: (state) => state.smarthome.groups,
+    getSystemControls: (state) => state.system.controls,
+    getLog: (state) => state.log,
+    getSystemDevices: (state) => state.system.devices,
 };
 let mutations = {
     WEBSOCKET_CONNECTION: (state, payload) => {
@@ -42,7 +44,7 @@ let mutations = {
     },
     UPDATE_LIGHTBULB_ONOFF_TOGGLE: (state, payload) => {
         let device = state.smarthome.lightbulbs.filter(
-            item => item.id == payload
+            (item) => item.id == payload
         );
         if (device.length > 0) {
             let currentLightbulb = device[0];
@@ -53,7 +55,7 @@ let mutations = {
     },
     UPDATE_LIGHTBULB_ONOFF: (state, payload) => {
         let device = state.smarthome.lightbulbs.filter(
-            item => item.id == payload.id
+            (item) => item.id == payload.id
         );
         if (device.length > 0) {
             let currentLightbulb = device[0];
@@ -64,21 +66,21 @@ let mutations = {
     },
     UPDATE_LIGHTBULB_BRIGHTNESS: (state, payload) => {
         let device = state.smarthome.lightbulbs.filter(
-            item => item.id == payload.id
+            (item) => item.id == payload.id
         );
         if (device.length > 0) {
             let currentLightbulb = device[0];
             currentLightbulb.busy = true;
             currentLightbulb.brightness = {
                 current: payload.brightness,
-                initial: payload.brightness
+                initial: payload.brightness,
             };
             currentLightbulb.busy = false;
         }
     },
     RESET_LIGHTBULB_BRIGHTNESS: (state, payload) => {
         let device = state.smarthome.lightbulbs.filter(
-            item => item.id == payload.id
+            (item) => item.id == payload.id
         );
         if (device.length > 0) {
             let currentLightbulb = device[0];
@@ -90,12 +92,15 @@ let mutations = {
     SYSTEM_CONTROLS: (state, payload) => {
         state.system.controls = payload;
     },
+    SYSTEM_DEVICES: (state, payload) => {
+        state.system.devices = payload;
+    },
     APP_LOG: (state, payload) => {
         state.log.app = payload;
     },
     ERROR_LOG: (state, payload) => {
         state.log.error = payload;
-    }
+    },
 };
 let actions = {
     setWebsocketConnection(context, payload) {
@@ -104,7 +109,7 @@ let actions = {
     async fetchSmarthomeData(context, payload) {
         let response = await axios({
             method: "GET",
-            url: `${url}/smarthome/list`
+            url: `${url}/smarthome/list`,
         });
         if (response.status == 200) {
             let groups = Object.entries(response.data.groups).map(
@@ -113,7 +118,7 @@ let actions = {
                         id: item.instanceId,
                         name: item.name,
                         isOn: item.onOff,
-                        groupMember: item.deviceIDs
+                        groupMember: item.deviceIDs,
                     };
                 }
             );
@@ -122,7 +127,7 @@ let actions = {
             let lightbulbs = Object.entries(response.data.lightbulbs)
                 .filter(([key, item]) => key != 65551)
                 .map(([key, item]) => {
-                    let groupInfo = groups.filter(group =>
+                    let groupInfo = groups.filter((group) =>
                         group.groupMember.includes(item.instanceId)
                     );
                     let group = groupInfo.length > 0 ? groupInfo[0] : null;
@@ -135,12 +140,12 @@ let actions = {
                         isDimmable: lightInfo.isDimmable,
                         brightness: {
                             current: lightInfo.dimmer,
-                            initial: lightInfo.dimmer
+                            initial: lightInfo.dimmer,
                         },
                         color: lightInfo.color,
                         spectrum: lightInfo.spectrum,
                         group: group,
-                        busy: false
+                        busy: false,
                     };
                 });
             context.commit("LIGHTBULBS", lightbulbs);
@@ -151,7 +156,7 @@ let actions = {
             await axios({
                 method: "PUT",
                 url: `${url}/smarthome/device/toggle`,
-                data: { device: payload }
+                data: { device: payload },
             });
 
             context.commit("UPDATE_LIGHTBULB_ONOFF_TOGGLE", payload);
@@ -162,12 +167,12 @@ let actions = {
             await axios({
                 method: "PUT",
                 url: `${url}/smarthome/device/on`,
-                data: { device: payload }
+                data: { device: payload },
             });
 
             context.commit("UPDATE_LIGHTBULB_ONOFF", {
                 id: payload,
-                isOn: true
+                isOn: true,
             });
         } catch (e) {}
     },
@@ -176,12 +181,12 @@ let actions = {
             await axios({
                 method: "PUT",
                 url: `${url}/smarthome/device/off`,
-                data: { device: payload }
+                data: { device: payload },
             });
 
             context.commit("UPDATE_LIGHTBULB_ONOFF", {
                 id: payload,
-                isOn: false
+                isOn: false,
             });
         } catch (e) {}
     },
@@ -190,7 +195,7 @@ let actions = {
             await axios({
                 method: "PUT",
                 url: `${url}/smarthome/device/brightness`,
-                data: { device: payload.id, brightness: payload.brightness }
+                data: { device: payload.id, brightness: payload.brightness },
             });
             context.commit("UPDATE_LIGHTBULB_BRIGHTNESS", payload);
         } catch (e) {
@@ -202,15 +207,15 @@ let actions = {
             await axios({
                 method: "PUT",
                 url: `${url}/smarthome/group/on`,
-                data: { group: payload }
+                data: { group: payload },
             });
 
             context.getters.getLightbulbs
-                .filter(lightbulb => lightbulb.group.id === payload)
-                .forEach(lightbulb =>
+                .filter((lightbulb) => lightbulb.group.id === payload)
+                .forEach((lightbulb) =>
                     context.commit("UPDATE_LIGHTBULB_ONOFF", {
                         id: lightbulb.id,
-                        isOn: true
+                        isOn: true,
                     })
                 );
         } catch (e) {}
@@ -220,15 +225,15 @@ let actions = {
             await axios({
                 method: "PUT",
                 url: `${url}/smarthome/group/off`,
-                data: { group: payload }
+                data: { group: payload },
             });
 
             context.getters.getLightbulbs
-                .filter(lightbulb => lightbulb.group.id === payload)
-                .forEach(lightbulb =>
+                .filter((lightbulb) => lightbulb.group.id === payload)
+                .forEach((lightbulb) =>
                     context.commit("UPDATE_LIGHTBULB_ONOFF", {
                         id: lightbulb.id,
-                        isOn: false
+                        isOn: false,
                     })
                 );
         } catch (e) {}
@@ -238,26 +243,26 @@ let actions = {
             await axios({
                 method: "PUT",
                 url: `${url}/smarthome/group/brightness`,
-                data: { group: payload.id, brightness: payload.brightness }
+                data: { group: payload.id, brightness: payload.brightness },
             });
             context.getters.getLightbulbs
-                .filter(lightbulb => lightbulb.group.id === payload.id)
-                .forEach(lightbulb =>
+                .filter((lightbulb) => lightbulb.group.id === payload.id)
+                .forEach((lightbulb) =>
                     context.commit("UPDATE_LIGHTBULB_BRIGHTNESS", {
                         id: lightbulb.id,
-                        brightness: payload.brightness
+                        brightness: payload.brightness,
                     })
                 );
         } catch (e) {
             context.getters.getLightbulbs
-                .filter(lightbulb => lightbulb.group.id === payload.id)
-                .forEach(lightbulb =>
+                .filter((lightbulb) => lightbulb.group.id === payload.id)
+                .forEach((lightbulb) =>
                     context.commit("RESET_LIGHTBULB_BRIGHTNESS", {
                         id: lightbulb.id,
                         brightness: {
                             initial: lightbulb.brightness.initial,
-                            current: payload.brightness
-                        }
+                            current: payload.brightness,
+                        },
                     })
                 );
         }
@@ -265,7 +270,7 @@ let actions = {
     async fetchSystemControls(context, payload) {
         let response = await axios({
             method: "GET",
-            url: `${url}/system/display/status`
+            url: `${url}/system/display/status`,
         });
         if (response.status == 200) {
             context.commit("SYSTEM_CONTROLS", response.data);
@@ -275,7 +280,7 @@ let actions = {
         try {
             const response = await axios({
                 method: "PUT",
-                url: `${url}/system/display/` + (payload ? "on" : "off")
+                url: `${url}/system/display/` + (payload ? "on" : "off"),
             });
             context.commit("SYSTEM_CONTROLS", response.data);
         } catch (e) {
@@ -290,7 +295,7 @@ let actions = {
             const response = await axios({
                 method: "PUT",
                 url: `${url}/system/display/brightness`,
-                data: { brightness: payload }
+                data: { brightness: payload },
             });
             context.commit("SYSTEM_CONTROLS", response.data);
         } catch (e) {
@@ -303,7 +308,7 @@ let actions = {
     async fetchAppLog(context) {
         let response = await axios({
             method: "GET",
-            url: `${url}/logging/app`
+            url: `${url}/logging/app`,
         });
         if (response.status == 200) {
             context.commit("APP_LOG", response.data);
@@ -312,17 +317,26 @@ let actions = {
     async fetchErrorLog(context) {
         let response = await axios({
             method: "GET",
-            url: `${url}/logging/error`
+            url: `${url}/logging/error`,
         });
         if (response.status == 200) {
             context.commit("ERROR_LOG", response.data);
         }
-    }
+    },
+    async fetchSystemDevices(context, payload) {
+        let response = await axios({
+            method: "GET",
+            url: `${url}/devices/all`,
+        });
+        if (response.status == 200) {
+            context.commit("SYSTEM_DEVICES", response.data);
+        }
+    },
 };
 
 export default new Vuex.Store({
     state: state,
     getters: getters,
     mutations: mutations,
-    actions: actions
+    actions: actions,
 });
